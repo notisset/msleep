@@ -8,12 +8,12 @@
 
 void* sleepfn(void *args) {
     int how_much = *(int*)args;
-    for(int i = 0; i < how_much; i++)
-        sleep(1);
+    sleep(how_much);
     return NULL;
 }
 
 int main(int argc, char *argv[]) {
+    int i;
     Options *opts = parseopt(argc, argv);
     if(opts->verbose)
         printf("threads: %d\nseconds: %lld\n", opts->thread_no, opts->time);
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     pthread_t *threads = calloc(sizeof(pthread_t), opts->thread_no);
 
     //spawn threads
-    for(int i = 0; i < opts->thread_no; i++) {
+    for(i = 0; i < opts->thread_no; i++) {
         int ptherr = pthread_create(&threads[i], NULL, sleepfn, &perth);
         if(ptherr) {
             fprintf(stderr, "can't spawn thread\n");
@@ -36,8 +36,9 @@ int main(int argc, char *argv[]) {
     }
 
     //join threads
-    for(int i = 0; i < opts->thread_no; i++)
+    for(i = 0; i < opts->thread_no; i++)
         pthread_join(threads[i], NULL);
 
     freeopt(opts);
+    return 0;
 }
