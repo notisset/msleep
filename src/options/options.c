@@ -4,6 +4,24 @@
 #include <unistd.h>
 #include "options.h"
 
+static int parsetime(char *str, long long *time) {
+    char *inv;
+    *time = strtoll(str, &inv, 10);
+    if(strlen(inv) > 1) return 1;
+    switch(inv[0]){
+        case 's':
+            return 0;
+        case 'm':
+            *time *= 60;
+            return 0;
+        case 'h':
+            *time *= 60 * 60;
+            return 0;
+        default:
+            return 1;
+    }
+}
+
 void printhelp() {
     char *fmt = "USAGE: msleep [OPTIONS] [TIME]\n"
                 "OPTIONS:\n"
@@ -65,9 +83,10 @@ Options* parseopt(int argc, char *argv[]) {
     while((c = getopt(argc, argv, "hn:v")) != -1)
         set_opt(c, ret);
 
-    //TODO: implement suffix (s = seconds, m = minutes, h = hours)
-    if(argc - optind)
-        ret->time = strtoll(argv[optind], NULL, 10);
+    if(!(argc - optind) || parsetime(argv[optind], &(ret->time))) {
+        fprintf(stderr, "format error\n");
+        exit(EXIT_FAILURE);
+    }
 
     return ret;
 }
