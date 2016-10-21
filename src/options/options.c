@@ -8,6 +8,9 @@ static int parsetime(char *str, long long *time) {
     char *inv;
     *time = strtoll(str, &inv, 10);
     if(strlen(inv) > 1) return 1;
+    if(!inv[0]){
+	return 0;
+    }
     switch(inv[0]){
         case 's':
             return 0;
@@ -85,6 +88,7 @@ Options* parseopt(int argc, char *argv[]) {
 
     if(!(argc - optind) || parsetime(argv[optind], &(ret->time))) {
         fprintf(stderr, "format error\n");
+	printhelp();
         exit(EXIT_FAILURE);
     }
 
